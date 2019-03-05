@@ -35,8 +35,8 @@ export default class NavLeft extends React.Component {
     return (
       <div>
         <div className="logo">
-          <img src="favicon.ico" alt="" />
-          <h1>Imooc</h1>
+          <img src="logo.jpg" alt="" />
+          <h1>中福在线备件管理系统</h1>
         </div>
         <Menu theme="dark">{this.state.menuTreeNode}</Menu>
       </div>

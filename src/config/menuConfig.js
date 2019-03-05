@@ -1,91 +1,63 @@
 const menuList = [{
   title: '首页',
-  key: "/admin/home"
+  key: "/home"
 },
 {
-  title: 'UI',
-  key: "/admin/ui",
+  title: '基本信息',
+  key: "/base",
   children: [{
-    title: '按钮',
-    key: "/admin/ui/buttons"
+    title: '商品管理',
+    key: "/base/goods"
   }, {
-    title: '弹窗',
-    key: "/admin/ui/modals"
-  }, {
-    title: 'Loading',
-    key: "/admin/ui/loading"
-  }, {
-    title: '通知提醒',
-    key: "/admin/ui/notification"
-  }, {
-    title: '全局Message',
-    key: "/admin/ui/messages"
-  }, {
-    title: 'Tab页签',
-    key: "/admin/ui/tabs"
-  }, {
-    title: '图片画廊',
-    key: "/admin/ui/gallery"
+    title: '销售厅管理',
+    key: "/base/departments"
   }]
 },
 {
-  title: '表单',
-  key: "/admin/form"
-},
-{
-  title: '表格',
-  key: "/admin/table"
-},
-{
-  title: '富文本',
-  key: "/admin/rich"
-},
-{
-  title: '城市管理',
-  key: "/admin/city"
-},
-{
-  title: '订单管理',
-  key: "/admin/order"
-},
-{
-  title: '员工管理',
-  key: "/admin/member"
-},
-{
-  title: '车辆地图',
-  key: "/admin/bikeMap"
-},
-{
-  title: '图标',
-  key: "/admin/charts",
+  title: '入库管理',
+  key: "/in",
   children: [{
-    title: '柱形图',
-    key: "/admin/charts/bar"
+    title: '入库管理',
+    key: "/in/management"
   }, {
-    title: '饼图',
-    key: "/admin/charts/pie"
-  }, {
-    title: '折线图',
-    key: "/admin/charts/line"
-  }, {
-    title: '通知提醒',
-    key: "/admin/ui/notification"
-  }, {
-    title: '全局Message',
-    key: "/admin/ui/messages"
-  }, {
-    title: 'Tab页签',
-    key: "/admin/ui/tabs"
-  }, {
-    title: '图片画廊',
-    key: "/admin/ui/gallery"
+    title: '入库统计',
+    key: "/in/statistics"
   }]
 },
 {
-  title: '权限设置',
-  key: "/admin/permission"
+  title: '出库管理',
+  key: "/out",
+  children: [{
+    title: '出库管理',
+    key: "/out/management"
+  }, {
+    title: '出库统计',
+    key: "/out/statistics"
+  }]
 },
+{
+  title: '收货管理',
+  key: "/receiving",
+  children: [{
+    title: '收货管理',
+    key: "/receiving/management"
+  }, {
+    title: '收货统计',
+    key: "/receiving/statistics"
+  }]
+},
+{
+  title: '退货管理',
+  key: "/return",
+  children: [{
+    title: '退货管理',
+    key: "/return/management"
+  }, {
+    title: '退货统计',
+    key: "/return/statistics"
+  }]
+},
+
 ];
 
 export default menuList;
