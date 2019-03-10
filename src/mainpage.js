@@ -12,9 +12,9 @@ export default class MainPage extends React.Component {
           <NavLeft />
         </Col>
         <Col span="20" className="main">
-          <Header>Header</Header>
+          <Header/>
           <Row className="content">{this.props.children}</Row>
-          <Footer>Footer</Footer>
+          <Footer/>
         </Col>
       </Row>
     );

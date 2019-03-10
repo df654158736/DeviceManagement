@@ -1,7 +1,4 @@
-const menuList = [{
-  title: '首页',
-  key: "/home"
-},
+const menuList = [
 {
   title: '基本信息',
   key: "/base",

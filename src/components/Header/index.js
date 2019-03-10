@@ -25,15 +25,7 @@ export default class Header extends React.Component {
             <a href="www.baidu.com">退出</a>
           </Col>
         </Row>
-        <Row className="breadcrumb">
-          <Col span="4" className="breadcrumb-title">
-            首页
-          </Col>
-          <Col span="20" className="weather">
-            <span className="date">{this.state.sysTime}</span>
-            <span className="weather-detail">晴转多云</span>
-          </Col>
-        </Row>
+      
       </div>
     );
   }

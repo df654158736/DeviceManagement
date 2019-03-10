@@ -1,8 +1,10 @@
 import React from "react";
 import App from "./App";
 import MainPage from "./mainpage";
-import Button from "./pages/ui/buttons";
-import Home from "./pages/home";
+import InManagement from "./pages/inmanagement/management";
+import InStatistics from "./pages/inmanagement/statistics";
+import SparePart from "./pages/basic/SparePart";
+import Hall from "./pages/basic/hall"
 import NoMatch from "./pages/nomatch";
 import { HashRouter as Router, Route, Switch } from "react-router-dom";
 
@@ -13,18 +15,27 @@ export default class IRouter extends React.Component {
         <App>
           <MainPage>
             <Switch>
-              <Route path="/home" component={Home} />
               <Route
-                exact="true"
-                path="/base"
+                path="/basic"
                 render={() => (
                   <div>
                     <Switch>
-                      <Route path="/base/goods" component={Home} />
-                      <Route path="/base/departments" component={Button} />
+                      <Route path="/basic/product" component={SparePart} />
+                      <Route path="/basic/hall" component={Hall} />
                       <Route component={NoMatch} />
                     </Switch>
-                    <Route component={NoMatch} />
+                  </div>
+                )}
+               />
+                <Route
+                path="/checkin"
+                render={() => (
+                  <div>
+                    <Switch>
+                      <Route path="/checkin/manage" component={InManagement} />
+                      <Route path="/checkin/count" component={InStatistics} />
+                      <Route component={NoMatch} />
+                    </Switch>
                   </div>
                 )}
               />

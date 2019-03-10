@@ -1,5 +1,7 @@
 @colorA:'red';
 @import "./default.less";
+@import "./loading.less";
+
 div{color:@colorA}
 
 .container{
@@ -10,6 +12,8 @@ div{color:@colorA}
   }
   .main{
     background-color:@colorL;
+    height: calc(100vh);
+    overflow:auto;
   }
   .content{
     position: relative;
