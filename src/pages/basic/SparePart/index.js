@@ -1,9 +1,10 @@
 import React from "react";
 import { Card, Table } from "antd";
 import axios from "../../../axios/index";
-import "./index.less"
+
 export default class SparePart extends React.Component {
   state = {};
+ 
 
   componentDidMount() {
     this.request();
@@ -24,6 +25,9 @@ export default class SparePart extends React.Component {
           });
       });
   };
+
+
+
 
   render() {
     const columns = [
@@ -51,9 +55,9 @@ export default class SparePart extends React.Component {
     ];
 
     return (
-      <div className="home-wrap">
-        <Card title="商品信息" >
-          <Table columns={columns} dataSource={this.state.dataSource} bordered="true"/>
+      <div>
+        <Card title="商品信息">
+          <Table  columns={columns} dataSource={this.state.dataSource} bordered="true"/>
         </Card>
       </div>
     );

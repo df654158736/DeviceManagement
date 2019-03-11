@@ -18,25 +18,21 @@ export default class IRouter extends React.Component {
               <Route
                 path="/basic"
                 render={() => (
-                  <div>
                     <Switch>
                       <Route path="/basic/product" component={SparePart} />
                       <Route path="/basic/hall" component={Hall} />
                       <Route component={NoMatch} />
                     </Switch>
-                  </div>
                 )}
                />
                 <Route
                 path="/checkin"
                 render={() => (
-                  <div>
                     <Switch>
                       <Route path="/checkin/manage" component={InManagement} />
                       <Route path="/checkin/count" component={InStatistics} />
                       <Route component={NoMatch} />
                     </Switch>
-                  </div>
                 )}
               />
                <Route component={NoMatch} />
