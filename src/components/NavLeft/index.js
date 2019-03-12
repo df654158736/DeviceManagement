@@ -59,7 +59,7 @@ export default class NavLeft extends React.Component {
           <img src="logo.jpg" alt="" />
           <h1>中福在线备件管理系统</h1>
         </div>
-        <Menu theme="dark"  mode="inline" defaultOpenKeys={['/basic','/checkin','/checkout','/recevie','/refund']}>{this.state.menuTreeNode1}</Menu>
+        <Menu theme="dark"  mode="inline" defaultOpenKeys={['/basic','/checkin','/checkout','/receive','/refund']}>{this.state.menuTreeNode1}</Menu>
       </div>
     );
   }

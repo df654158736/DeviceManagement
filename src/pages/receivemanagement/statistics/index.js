@@ -1,37 +1,31 @@
 import React from "react";
-import { Card, Table, Button ,Modal, message } from "antd";
+import { Card, Table, Modal, message, Button } from "antd";
 import axios from "../../../axios/index";
 import BaseForm from "./../../../components/BaseForm/index";
 
 export default class Statistics extends React.Component {
-  state = {};
+  state = {
+    formList:[
+      {
+        type: "Cascader",
+        label: "地域筛选",
+        field: "region",
+        placeholder: "请选择地域",
+        options:[]
+        },
+      {
+        type: "DATEPICKER",
+        placeholder: "请选择时间"
+      }
+    ]
+  };
   params = {
     pageNum: "1",
     pageSize: "10",
     startTm: "2018-1-1",
     endTm: "2019-12-1",
-    auditState: "0"
+    type:1
   };
-
-  formList = [
-    {
-      type: "SELECT",
-      label: "审核状态",
-      field: "state",
-      placeholder: "全部",
-      initialValue: "2",
-      width: 100,
-      list: [
-        { id: "2", name: "全部" },
-        { id: "0", name: "未审核" },
-        { id: "1", name: "已审核" },
-      ]
-    },
-    {
-      type: "DATEPICKER",
-      placeholder: "请选择时间"
-    }
-  ];
 
   componentDidMount() {
     this.request();
@@ -41,7 +35,7 @@ export default class Statistics extends React.Component {
     axios
       .ajax({
         method: "post",
-        url: "/checkin/getCheckInCountList",
+        url: "/receive/materialCountList",
         data: {
           params: this.params
         }
@@ -51,13 +45,46 @@ export default class Statistics extends React.Component {
           dataSource: res.list
         });
       });
+
+      if(this.state.formList[0].options.length==0){//eslint-disable-line
+        axios
+        .ajax({
+          method: "post",
+          url: "/hall/getHallList",
+          data: {
+            params: { provId: "", cityId: "", hallId: "" }
+          }
+        })
+        .then(res => {
+          this.setState({
+            formList:[
+              {
+                type: "Cascader",
+                label: "地域筛选",
+                field: "region",
+                placeholder: "请选择地域",
+                options:res
+                },
+              {
+                type: "DATEPICKER",
+                placeholder: "请选择时间"
+              }
+            ]
+          });
+        });
+      }
   };
 
   handleFilter = params => {
-    this.params = {pageNum: "1",pageSize: "10",startTm: params.begin_time,endTm: params.end_time,auditState: params.state};
-
-    if(params.state==2){  //eslint-disable-line
-      this.params.auditState = null;
+    this.params = {type:1,pageNum: "1",pageSize: "100",startTm: params.begin_time,endTm: params.end_time};
+    if(params.region !== undefined){
+      if (params.region.length == 3) {  //eslint-disable-line
+        this.params = {type:1,pageNum: "1",pageSize: "100",startTm: params.begin_time,endTm: params.end_time, provId: params.region[0],cityId: params.region[1],hallId: params.region[2]};
+      } else if (params.region.length == 2) {  //eslint-disable-line
+        this.params = {type:1,pageNum: "1",pageSize: "100",startTm: params.begin_time,endTm: params.end_time, provId: params.region[0],cityId: params.region[1]};
+      } else if (params.region.length == 1) {  //eslint-disable-line
+        this.params = {type:1,pageNum: "1",pageSize: "100",startTm: params.begin_time,endTm: params.end_time,provId: params.region[0] };
+      } 
     }
     this.request();
   };
@@ -91,7 +118,7 @@ export default class Statistics extends React.Component {
     const columns = [
       {
         title: "商品编号",
-        dataIndex: "sparePartSn"
+        dataIndex: "materialSn"
       },
       {
         title: "类别",
@@ -118,7 +145,7 @@ export default class Statistics extends React.Component {
     return (
       <div>
         <Card>
-          <BaseForm formList={this.formList} filterSubmit={this.handleFilter} />
+          <BaseForm formList={this.state.formList} filterSubmit={this.handleFilter} />
         </Card>
         <Card style={{ marginTop: 10 }}>
           <Button

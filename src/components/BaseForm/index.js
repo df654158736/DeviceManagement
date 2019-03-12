@@ -1,5 +1,5 @@
 import React from "react";
-import { Input, Select, Form, Button, DatePicker } from "antd";
+import { Input, Select, Form, Button, DatePicker,Cascader } from "antd";
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -16,7 +16,9 @@ class FilterForm extends React.Component {
         let placeholder = item.placeholder;
         let width = item.width;
 
-        if (item.type == "DATEPICKER") {
+        let options = item.options;
+
+        if (item.type == "DATEPICKER") {//eslint-disable-line
           const begin_time = 
             <FormItem label="查询时间" key="begin_time" >
               {getFieldDecorator("begin_time")(
@@ -42,7 +44,7 @@ class FilterForm extends React.Component {
          
           formItemList.push(end_time);
         }
-        else if (item.type == "INPUT") {
+        else if (item.type == "INPUT") {//eslint-disable-line
           const INPUT = 
             <FormItem label={label} key={field}>
               {getFieldDecorator([field], {
@@ -52,7 +54,7 @@ class FilterForm extends React.Component {
         
           formItemList.push(INPUT);
         } 
-        else if (item.type == "SELECT") {
+        else if (item.type == "SELECT") {//eslint-disable-line
           const SELECT =
             <FormItem label={label} key={field}>
               {getFieldDecorator([field], {
@@ -70,6 +72,25 @@ class FilterForm extends React.Component {
             </FormItem>
         
           formItemList.push(SELECT);
+        }else if(item.type == "Cascader"){//eslint-disable-line
+          const CASCADER =
+          <FormItem label={label} key={field}>
+            {getFieldDecorator([field])(
+              <Cascader
+              options={options}
+              fieldNames={{
+              label: "value",
+              value: "id",
+              children: "childList"
+              }}
+              changeOnSelect
+              placeholder={placeholder}
+              style={{ width: 300 }}
+            />
+            )}
+          </FormItem>
+      
+        formItemList.push(CASCADER);
         }
       });
     }
