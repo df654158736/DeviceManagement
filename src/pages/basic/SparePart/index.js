@@ -42,7 +42,7 @@ export default class SparePart extends React.Component {
         title: "新增商品",
         SpareInfo: null
       });
-    } else if (type == "Update") {  //eslint-disable-line
+    } else if (type == "Update") {  //eslint-disabl~e-line
       this.setState({
         type: type,
         isVisible: true,
