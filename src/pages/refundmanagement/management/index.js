@@ -47,31 +47,50 @@ export default class Management extends React.Component {
       });
 
       
-      if(this.state.formList[0].options.length==0){//eslint-disable-line
+      let localOptions = JSON.parse(localStorage.getItem("options"));
+
+      if (!localOptions) {
         axios
-        .ajax({
-          method: "post",
-          url: "/hall/getHallList",
-          data: {
-            params: { provId: "", cityId: "", hallId: "" }
-          }
-        })
-        .then(res => {
-          this.setState({
-            formList:[
-              {
-                type: "Cascader",
-                label: "地域筛选",
-                field: "region",
-                placeholder: "请选择地域",
-                options:res
+          .ajax({
+            method: "post",
+            url: "/hall/getHallList",
+            data: {
+              params: { provId: "", cityId: "", hallId: "" }
+            }
+          })
+          .then(res => {
+            localStorage.setItem("options", JSON.stringify(res));
+            this.setState({
+              formList: [
+                {
+                  type: "Cascader",
+                  label: "地域筛选",
+                  field: "region",
+                  placeholder: "请选择地域",
+                  options: res
                 },
-              {
-                type: "DATEPICKER",
-                placeholder: "请选择时间"
-              }
-            ]
+                {
+                  type: "DATEPICKER",
+                  placeholder: "请选择时间"
+                }
+              ]
+            });
           });
+      } else {
+        this.setState({
+          formList: [
+            {
+              type: "Cascader",
+              label: "地域筛选",
+              field: "region",
+              placeholder: "请选择地域",
+              options: localOptions
+            },
+            {
+              type: "DATEPICKER",
+              placeholder: "请选择时间"
+            }
+          ]
         });
       }
   };
@@ -123,12 +142,13 @@ export default class Management extends React.Component {
         cancelText: "取消",
         onOk: () => {
           axios
-            .ajax({
+            .ajaxExcel({
               method: "post",
-              url: "/checkin/CheckInCountExcelDownloads",
+              url: "/receive/receiveDownloads ",
               data: {
                 params: this.params
-              }
+              },
+              fileName:"退货单.xls"
             })
             .then(res => {
               message.success("导出成功");

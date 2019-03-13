@@ -2,7 +2,7 @@ import React from "react";
 import { Menu } from "antd";
 import SubMenu from "antd/lib/menu/SubMenu";
 import "./index.less";
-import axios from "../../axios/index";
+
 import {NavLink} from "react-router-dom"
 
 export default class NavLeft extends React.Component {
@@ -10,29 +10,21 @@ export default class NavLeft extends React.Component {
   state = {};
 
   componentDidMount() {
-    this.request();
-  }
-
-  request = () => {
-    axios
-      .ajax({
-        method:"post",
-        url: "/user/login",
-        data: {
-          params: {
-            "name":"aaa",
-            "password":"test"
-          },
-          isShowLoading:false
-        }
-      })
-      .then(res => {
-        const menuTreeNode = this.renderMenu(res.moduleList);
-        this.setState({
-          menuTreeNode1:menuTreeNode
-        });
+    let userInfo =JSON.parse(localStorage.getItem('user'));
+    if(!userInfo){
+      window.location.href = "/#/login";
+      const menuTreeNode = this.renderMenu([]);
+      this.setState({
+        menuTreeNode1:menuTreeNode
       });
-  };
+    }else{
+      const menuTreeNode = this.renderMenu(userInfo.moduleList);
+      this.setState({
+        menuTreeNode1:menuTreeNode
+      });
+    }
+   
+  }
 
   //菜单渲染
   renderMenu = data => {

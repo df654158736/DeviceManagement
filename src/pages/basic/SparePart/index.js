@@ -5,7 +5,18 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 export default class SparePart extends React.Component {
   state = {};
+  params= {
+    pageNum: "1",
+    pageSize: "100",
+    startTm: "2018-1-1",
+    endTm: "2019-12-1",
+    auditState: "1"
+  }
   componentDidMount() {
+    let userInfo =JSON.parse(localStorage.getItem('user'));
+    if(userInfo){
+     message.success(`${userInfo.user.name} 登录成功`)
+    }
     this.request();
   }
 
@@ -14,15 +25,7 @@ export default class SparePart extends React.Component {
       .ajax({
         method: "post",
         url: "/sparePart/getSparePartList",
-        data: {
-          params: {
-            pageNum: "1",
-            pageSize: "100",
-            startTm: "2018-1-1",
-            endTm: "2019-12-1",
-            auditState: "1"
-          }
-        }
+        data: this.params
       })
       .then(res => {
         this.setState({
@@ -53,8 +56,18 @@ export default class SparePart extends React.Component {
         okText: "确认",
         cancelText: "取消",
         onOk: () => {
-          message.success("删除成功");
-          this.request();
+          axios
+            .ajax({
+              method: "post",
+              url: "/sparePart/deleteSparePart",
+              data: {
+                params: {sparePartId:item.sparePartId}
+              },
+            })
+            .then(res => {
+              message.success("删除成功");
+              this.request();
+            });
         }
       });
     } else if (type == "Export") {  //eslint-disable-line
@@ -64,8 +77,19 @@ export default class SparePart extends React.Component {
         okText: "确认",
         cancelText: "取消",
         onOk: () => {
-          message.success("导出成功");
-          this.request();
+          axios
+            .ajaxExcel({
+              method: "post",
+              url: "/sparePart/SparePartDownloads",
+              data: {
+                params: this.params
+              },
+              fileName:"商品列表单.xls"
+            })
+            .then(res => {
+              message.success("导出成功");
+              this.request();
+            });
         }
       });
     }
@@ -155,7 +179,7 @@ export default class SparePart extends React.Component {
     return (
       <div>
         <div>
-          <Card style={{ marginTop: 10 }}>
+          <Card>
             <Button
               type="primary"
               onClick={() => this.handleOperation("Created", null)}

@@ -5,16 +5,25 @@ import Util from "../../utils/utils";
 
 export default class Header extends React.Component {
   componentWillMount() {
-    this.setState({
-      userName: "admin"
-    });
-
-    setInterval(() => {
-      let sysTime = Util.formatDate(new Date().getTime());
+    let userInfo =JSON.parse(localStorage.getItem('user'));
+    if(!userInfo){
+      window.location.href = "/#/login";
       this.setState({
-        sysTime
+        userName: ""
       });
-    }, 1000);
+    }else{
+      this.setState({
+        userName: userInfo.user.name
+      });
+  
+      setInterval(() => {
+        let sysTime = Util.formatDate(new Date().getTime());
+        this.setState({
+          sysTime
+        });
+      }, 1000);
+    }
+   
   }
   render() {
     return (
@@ -22,7 +31,7 @@ export default class Header extends React.Component {
         <Row className="header-top">
           <Col span="24">
             <span>欢迎，{this.state.userName}</span>
-            <a href="www.baidu.com">退出</a>
+            <a href="/#/login">退出</a>
           </Col>
         </Row>
       

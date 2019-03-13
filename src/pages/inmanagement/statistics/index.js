@@ -71,12 +71,13 @@ export default class Statistics extends React.Component {
         cancelText: "取消",
         onOk: () => {
           axios
-            .ajax({
+            .ajaxExcel({
               method: "post",
               url: "/checkin/CheckInCountExcelDownloads",
               data: {
                 params: this.params
-              }
+              },
+              fileName:"入库统计单.xls"
             })
             .then(res => {
               message.success("导出成功");

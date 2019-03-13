@@ -5,14 +5,14 @@ import BaseForm from "./../../../components/BaseForm/index";
 
 export default class Management extends React.Component {
   state = {
-    formList:[
+    formList: [
       {
         type: "Cascader",
         label: "地域筛选",
         field: "region",
         placeholder: "请选择地域",
         options:[]
-        },
+      },
       {
         type: "DATEPICKER",
         placeholder: "请选择时间"
@@ -23,15 +23,12 @@ export default class Management extends React.Component {
     pageNum: "1",
     pageSize: "10",
     startTm: "2018-1-1",
-    endTm: "2019-12-1",
+    endTm: "2019-12-1"
   };
-
- 
 
   componentDidMount() {
     this.request();
   }
-
 
   request = () => {
     axios
@@ -48,69 +45,117 @@ export default class Management extends React.Component {
         });
       });
 
-  
-    if(this.state.formList[0].options.length==0){//eslint-disable-line
-      axios
-      .ajax({
-        method: "post",
-        url: "/hall/getHallList",
-        data: {
-          params: { provId: "", cityId: "", hallId: "" }
-        }
-      })
-      .then(res => {
+      let localOptions = JSON.parse(localStorage.getItem("options"));
+
+      if (!localOptions) {
+        axios
+          .ajax({
+            method: "post",
+            url: "/hall/getHallList",
+            data: {
+              params: { provId: "", cityId: "", hallId: "" }
+            }
+          })
+          .then(res => {
+            localStorage.setItem("options", JSON.stringify(res));
+            this.setState({
+              formList: [
+                {
+                  type: "Cascader",
+                  label: "地域筛选",
+                  field: "region",
+                  placeholder: "请选择地域",
+                  options: res
+                },
+                {
+                  type: "DATEPICKER",
+                  placeholder: "请选择时间"
+                }
+              ]
+            });
+          });
+      } else {
         this.setState({
-          formList:[
+          formList: [
             {
               type: "Cascader",
               label: "地域筛选",
               field: "region",
               placeholder: "请选择地域",
-              options:res
-              },
+              options: localOptions
+            },
             {
               type: "DATEPICKER",
               placeholder: "请选择时间"
             }
           ]
         });
-      });
-    }
-  
+      }
   };
 
   handleFilter = params => {
-    
-    this.params = {pageNum: "1",pageSize: "100",startTm: params.begin_time,endTm: params.end_time};
-    if(params.region !== undefined){
+    this.params = {
+      pageNum: "1",
+      pageSize: "100",
+      startTm: params.begin_time,
+      endTm: params.end_time
+    };
+    if (params.region !== undefined) {
       if (params.region.length == 3) {  //eslint-disable-line
-        this.params = {pageNum: "1",pageSize: "100",startTm: params.begin_time,endTm: params.end_time, provId: params.region[0],cityId: params.region[1],hallId: params.region[2]};
+      
+        this.params = {
+          pageNum: "1",
+          pageSize: "100",
+          startTm: params.begin_time,
+          endTm: params.end_time,
+          provId: params.region[0],
+          cityId: params.region[1],
+          hallId: params.region[2]
+        };
       } else if (params.region.length == 2) {  //eslint-disable-line
-        this.params = {pageNum: "1",pageSize: "100",startTm: params.begin_time,endTm: params.end_time, provId: params.region[0],cityId: params.region[1]};
+      
+        this.params = {
+          pageNum: "1",
+          pageSize: "100",
+          startTm: params.begin_time,
+          endTm: params.end_time,
+          provId: params.region[0],
+          cityId: params.region[1]
+        };
       } else if (params.region.length == 1) {  //eslint-disable-line
-        this.params = {pageNum: "1",pageSize: "100",startTm: params.begin_time,endTm: params.end_time,provId: params.region[0] };
-      } 
+      
+        this.params = {
+          pageNum: "1",
+          pageSize: "100",
+          startTm: params.begin_time,
+          endTm: params.end_time,
+          provId: params.region[0]
+        };
+      }
     }
-  
+
     this.request();
   };
 
   handleOperation = (type, item) => {
-    if (type == "Created") {  //eslint-disable-line
+    if (type == "Created") {//eslint-disable-line
+      
       this.setState({
         type: type,
         isVisible: true,
         title: "新增商品",
         SpareInfo: null
       });
-    } else if (type == "Update") {  //eslint-disable-line
+    } else if (type == "Update") {     //eslint-disable-line
+ 
       this.setState({
         type: type,
         isVisible: true,
         title: "修改商品",
         SpareInfo: item
       });
-    } else if (type == "Deleted") {  //eslint-disable-line
+    } else if (type == "Deleted") { //eslint-disable-line
+     
       Modal.confirm({
         title: "确认",
         content: "您确认要删除此条数据吗？" + item.materialSn,
@@ -121,7 +166,7 @@ export default class Management extends React.Component {
           this.request();
         }
       });
-    } else if (type == "Export") {  //eslint-disable-line
+    } else if (type == "Export") { //eslint-disable-line
       Modal.confirm({
         title: "确认",
         content: "您确认要导出excel吗",
@@ -129,12 +174,13 @@ export default class Management extends React.Component {
         cancelText: "取消",
         onOk: () => {
           axios
-            .ajax({
+            .ajaxExcel({
               method: "post",
-              url: "/checkin/CheckInCountExcelDownloads",
+              url: "/checkout/CheckoutExcelDownloads",
               data: {
                 params: this.params
-              }
+              },
+              fileName:"出库单.xls"
             })
             .then(res => {
               message.success("导出成功");
@@ -168,7 +214,11 @@ export default class Management extends React.Component {
     return (
       <div>
         <Card>
-          <BaseForm className="bs" formList={this.state.formList} filterSubmit={this.handleFilter} />
+          <BaseForm
+            className="bs"
+            formList={this.state.formList}
+            filterSubmit={this.handleFilter}
+          />
         </Card>
         <Card style={{ marginTop: 10 }}>
           <Button

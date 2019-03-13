@@ -1,7 +1,9 @@
 import React from "react";
-import { Card, Table, Button, Modal, message } from "antd";
+import { Card, Table, Button, Modal, message,Form,Input,DatePicker } from "antd";
 import axios from "../../../axios/index";
 import BaseForm from "./../../../components/BaseForm/index";
+
+const FormItem = Form.Item;
 
 export default class Management extends React.Component {
   state = {};
@@ -49,12 +51,11 @@ export default class Management extends React.Component {
 
   handleOperation = (type,item) => {
     if(type=="Created"){  //eslint-disable-line
-    
       this.setState({
         type:type,
         isVisible: true,
         title: "新增商品",
-        SpareInfo:null
+        InData:null
       });
      
     }else if(type=="Update"){  //eslint-disable-line
@@ -62,7 +63,7 @@ export default class Management extends React.Component {
         type:type,
         isVisible: true,
         title: "修改商品",
-        SpareInfo: item
+        InData: item
       });
     }else if(type=="Deleted"){  //eslint-disable-line
       Modal.confirm({
@@ -80,22 +81,22 @@ export default class Management extends React.Component {
       Modal.confirm({
         title: "确认",
         content: "您确认要导出excel吗",
-        okText:"确认",
-        cancelText:"取消",
+        okText: "确认",
+        cancelText: "取消",
         onOk: () => {
           axios
-          .ajax({
-            method: "post",
-            url: "/checkin/CheckInCountExcelDownloads",
-            data: {
-              params: this.params
-            }
-          })
-          .then(res => {
-            message.success("导出成功");
-            this.request();
-          });
-         
+            .ajaxExcel({
+              method: "post",
+              url: "/checkin/CheckInExcelDownloads",
+              data: {
+                params: this.params
+              },
+              fileName:"入库单.xls"
+            })
+            .then(res => {
+              message.success("导出成功");
+              this.request();
+            });
         }
       });
     }
@@ -103,16 +104,16 @@ export default class Management extends React.Component {
 
   handleSubmit = () => {
      let type = this.state.type;
-     let parmas=  this.sparePartForm.props.form.getFieldsValue();
+     let parmas=  this.inManagementForm.props.form.getFieldsValue();
 
      if(type=="Update"){  //eslint-disable-line
-      parmas.sparePartId = this.state.SpareInfo.sparePartId;
+      parmas.storageId = this.state.InData.storageId;
      }
   
      axios
      .ajax({
        method: "post",
-       url: type=="Created"?"/sparePart/addSparePart":"/sparePart/updateSparePart",  //eslint-disable-line
+       url: type=="Created"?"/checkin/addCheckIn":"/checkin/updateCheckIn",  //eslint-disable-line
        data: {
          params: parmas
        }
@@ -123,7 +124,7 @@ export default class Management extends React.Component {
        }else{
         message.success("修改成功");
        }
-       this.sparePartForm.props.form.resetFields();
+       this.inManagementForm.props.form.resetFields();
     
        this.setState({
         isVisible:false
@@ -142,7 +143,64 @@ export default class Management extends React.Component {
     this.request();
       }
 
+  expandedRowRender = ()=>{
+   
+        const columns = [
+          { title: '商品编号', dataIndex: 'sparePartSn', key: 'sparePartSn' },
+          { title: '类别', dataIndex: 'sparePartType', key: 'sparePartType', 
+          //  render(sparePartType){
+          //    let config = {
+          //      "0":"未审核",
+          //      "1":"已审核"
+          //    }
+          //    return config[sparePartType];
+          // }
+          },
+          { title: '商品名称', dataIndex: 'sparePartName', key: 'sparePartName' },
+          { title: '规格型号', dataIndex: 'sparePartModel', key: 'sparePartModel' },
+          { title: '物料编码', dataIndex: 'materialSn', key: 'materialSn' },
+          { title: '数量', dataIndex: 'num', key: 'num'},
+          {
+            title: "操作",
+            render: (text, item) => {
+              return (
+                <div>
+                  <Button style={{marginLeft:10}} size="small" type="danger" onClick={() => this.handleOperation("Deleted",item)}>
+                    删除
+                  </Button>
+                </div>
+              );
+            }
+          }
+        ];
+       
+        return (
+          <Table style={{margin:10}}
+            columns={columns}
+            dataSource={this.state.itemdata}
+            bordered
+            pagination={{pageSize:5}}
+          />
+        );
+      }
 
+  handleExpanded =(isExpand,record)=>{
+       if(isExpand){
+        axios
+        .ajax({
+          method: "post",
+          url: "/checkin/getCheckInDeviceList",
+          data: {
+            params: {storageId:record.storageId}
+          }
+        })
+        .then(res => {
+          this.setState({
+            itemdata: res.deviceList
+          });
+        });
+      }
+      }
 
   render() {
     const columns = [
@@ -160,8 +218,15 @@ export default class Management extends React.Component {
       },
       {
         title: "审核状态",
-        dataIndex: "auditState"
-      },
+        dataIndex: "auditState",
+        key: 'auditState', 
+        render(auditState){
+          let config = {
+            "0":"未审核",
+            "1":"已审核"
+          }
+          return config[auditState];
+       }},
       {
         title: "操作",
         render: (text, item) => {
@@ -192,10 +257,74 @@ export default class Management extends React.Component {
             style={{ marginTop: 20 }}
             columns={columns}
             dataSource={this.state.dataSource}
+            expandedRowRender={() => this.expandedRowRender()}
+            onExpand={(isExpand,record) => {this.handleExpanded(isExpand,record)}}
             bordered="true"
           />
         </Card>
+        <Modal
+          title={this.state.title}
+          visible={this.state.isVisible}
+          okText="确认"
+          cancelText="取消"
+          onOk={this.handleSubmit}
+          onCancel={() => {
+            this.inManagementForm.props.form.resetFields();
+            this.setState({
+              isVisible: false
+            });
+          }}
+          width={600}
+        >
+          <InManagementForm
+            type={this.state.type}
+            InData={this.state.InData}
+            wrappedComponentRef={inst => {
+              this.inManagementForm = inst;
+            }}
+          />
+        </Modal>
       </div>
     );
   }
 }
+class InManagementForm extends React.Component {
+  render() {
+    let InData = this.props.InData || {};
+
+    const { getFieldDecorator } = this.props.form;
+    const formItemLayout = {
+      labelCol: { span: 5 },
+      wrapperCol: { span: 19 }
+    };
+    return (
+      <Form layout="horizontal">
+        <FormItem label=" 供货商" {...formItemLayout}>
+          {getFieldDecorator("supplier", {
+            initialValue: InData.supplier
+          })(<Input type="text" placeholder="请输入商品名称" />)}
+        </FormItem>
+        <FormItem label="库管验收意见" {...formItemLayout}>
+          {getFieldDecorator("opinion", {
+            initialValue: InData.opinion
+          })(<Input type="text" placeholder="请输入规格型号" />)}
+        </FormItem>
+        <FormItem label="备注" {...formItemLayout}>
+          {getFieldDecorator("mark", {
+            initialValue: InData.mark
+          })(<Input type="text" placeholder="请输入物料编码名" />)}
+        </FormItem>
+        <FormItem label="到货日期" {...formItemLayout} >
+              {getFieldDecorator("begin_time")(
+                <DatePicker
+                  showTime={true}
+                  placeholder={"请选择日期"}
+                  format="YYYY-MM-DD HH:mm:ss"
+                />
+              )}
+        </FormItem>
+      </Form>
+    );
+  }
+}
+InManagementForm = Form.create({})(InManagementForm);
