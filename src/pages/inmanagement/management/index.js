@@ -55,16 +55,31 @@ export default class Management extends React.Component {
         type:type,
         isVisible: true,
         title: "新增商品",
-        InData:null
+        InData:null,
+        itemdata:null
       });
      
     }else if(type=="Update"){  //eslint-disable-line
-      this.setState({
-        type:type,
-        isVisible: true,
-        title: "修改商品",
-        InData: item
+      axios
+      .ajax({
+        method: "post",
+        url: "/checkin/getCheckInDeviceList",
+        data: {
+          params: {storageId:item.storageId}
+        }
+      })
+      .then(res => {
+        this.setState({
+          itemdata: res,
+          type:type,
+          isVisible: true,
+          title: "修改商品",
+          InData: item
+        });
       });
+      // this.setState({
+      
+      // });
     }else if(type=="Deleted"){  //eslint-disable-line
       Modal.confirm({
         title: "确认",
@@ -177,7 +192,7 @@ export default class Management extends React.Component {
         return (
           <Table style={{margin:10}}
             columns={columns}
-            dataSource={this.state.itemdata}
+            dataSource={this.state.itemdata.deviceList}
             bordered
             pagination={{pageSize:5}}
           />
@@ -196,7 +211,7 @@ export default class Management extends React.Component {
         })
         .then(res => {
           this.setState({
-            itemdata: res.deviceList
+            itemdata: res
           });
         });
       }
@@ -279,6 +294,7 @@ export default class Management extends React.Component {
           <InManagementForm
             type={this.state.type}
             InData={this.state.InData}
+            IndataItem={this.state.itemdata}
             wrappedComponentRef={inst => {
               this.inManagementForm = inst;
             }}
@@ -289,15 +305,121 @@ export default class Management extends React.Component {
   }
 }
 class InManagementForm extends React.Component {
+   
+  state={
+    isVisible:false
+  }
+
+  handleOperation = (type,item) => {
+    if(type=="Created"){  //eslint-disable-line
+      this.setState({
+        type:type,
+        isVisible: true,
+        title: "新增商品",
+        InData:null,
+        itemdata:null
+      });
+     
+    }else if(type=="Update"){  //eslint-disable-line
+      axios
+      .ajax({
+        method: "post",
+        url: "/checkin/getCheckInDeviceList",
+        data: {
+          params: {storageId:item.storageId}
+        }
+      })
+      .then(res => {
+        this.setState({
+          itemdata: res,
+          type:type,
+          isVisible: true,
+          title: "修改商品",
+          InData: item
+        });
+      });
+      // this.setState({
+      
+      // });
+    }else if(type=="Deleted"){  //eslint-disable-line
+      Modal.confirm({
+        title: "确认",
+        content: "您确认要删除此条数据吗？" +item.materialSn,
+        okText:"确认",
+        cancelText:"取消",
+        onOk: () => {
+          message.success("删除成功");
+          this.request();
+        }
+      });
+    }
+    else if(type=="Export"){  //eslint-disable-line
+      Modal.confirm({
+        title: "确认",
+        content: "您确认要导出excel吗",
+        okText: "确认",
+        cancelText: "取消",
+        onOk: () => {
+          axios
+            .ajaxExcel({
+              method: "post",
+              url: "/checkin/CheckInExcelDownloads",
+              data: {
+                params: this.params
+              },
+              fileName:"入库单.xls"
+            })
+            .then(res => {
+              message.success("导出成功");
+              this.request();
+            });
+        }
+      });
+    }
+  };
+
   render() {
+    const columns = [
+      { title: '商品编号', dataIndex: 'sparePartSn', key: 'sparePartSn' },
+      { title: '类别', dataIndex: 'sparePartType', key: 'sparePartType', 
+      //  render(sparePartType){
+      //    let config = {
+      //      "0":"未审核",
+      //      "1":"已审核"
+      //    }
+      //    return config[sparePartType];
+      // }
+      },
+      { title: '商品名称', dataIndex: 'sparePartName', key: 'sparePartName' },
+      { title: '规格型号', dataIndex: 'sparePartModel', key: 'sparePartModel' },
+      { title: '物料编码', dataIndex: 'materialSn', key: 'materialSn' },
+      { title: '数量', dataIndex: 'num', key: 'num'},
+      {
+        title: "操作",
+        render: (text, item) => {
+          return (
+            <div>
+              <Button style={{marginLeft:10}} size="small" type="danger" onClick={() => this.handleOperation("Deleted",item)}>
+                删除
+              </Button>
+            </div>
+          );
+        }
+      }
+    ];
+
     let InData = this.props.InData || {};
+    let IndataItem = this.props.IndataItem || {};
 
     const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
       labelCol: { span: 5 },
       wrapperCol: { span: 19 }
     };
+
+    
     return (
+      <div>
       <Form layout="horizontal">
         <FormItem label=" 供货商" {...formItemLayout}>
           {getFieldDecorator("supplier", {
@@ -315,7 +437,7 @@ class InManagementForm extends React.Component {
           })(<Input type="text" placeholder="请输入物料编码名" />)}
         </FormItem>
         <FormItem label="到货日期" {...formItemLayout} >
-              {getFieldDecorator("begin_time")(
+              {getFieldDecorator("deliveryDate")(
                 <DatePicker
                   showTime={true}
                   placeholder={"请选择日期"}
@@ -324,6 +446,30 @@ class InManagementForm extends React.Component {
               )}
         </FormItem>
       </Form>
+      <Card  style={{ marginTop: 10 }}>
+        <Button type="primary" onClick={() => this.handleOperation("Created",null)}>新增</Button>
+        <Table style={{marginTop:10}}
+         columns={columns}
+         dataSource={IndataItem.deviceList}
+         bordered
+         pagination={{pageSize:5}}
+     />
+     </Card>
+     <Modal
+          title="新增商品"
+          visible={this.state.isVisible}
+          okText="确认"
+          cancelText="取消"
+          onOk={this.handleSubmit}
+          onCancel={() => {
+            this.setState({
+              isVisible: false
+            });
+          }}
+          width={600}
+        >
+     </Modal>
+     </div>
     );
   }
 }
