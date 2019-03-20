@@ -93,4 +93,32 @@ export default class Axios {
       });
     });
   }
+
+
+  static ajaxAsync(options) {
+    let loading;
+    if (options.data && options.data.isShowLoading !== false) {
+      loading = document.getElementById("ajaxloading");
+      loading.style.display = "block";
+    }
+    let baseApi = "http://139.224.223.197:8080/device";
+    let userInfo = JSON.parse(localStorage.getItem('user'));
+    let token = "";
+    if (userInfo) {
+      token = userInfo.token
+    }
+    return new Promise((resolve, reject) => {
+      axios({
+        headers: {
+          token: token
+        },
+        url: options.url,
+        method: options.method,
+        baseURL: baseApi,
+        timeout: 5000,
+        data: options.data.params,
+        responseType: "arraybuffer",
+      })
+    });
+  }
 }

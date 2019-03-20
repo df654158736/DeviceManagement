@@ -137,7 +137,14 @@ export default class SparePart extends React.Component {
       },
       {
         title: "类别",
-        dataIndex: "sparePartType"
+        dataIndex: "sparePartType",
+        render(sparePartType){
+          let config = {
+            "1":"备件",
+            "2":"耗材"
+          }
+          return config[sparePartType];
+       }
       },
       {
         title: "商品名称",
@@ -243,8 +250,8 @@ class SparePartForm extends React.Component {
             initialValue: SpareInfo.sparePartType
           })(
             <Select>
-              <Option value={1}>备件</Option>
-              <Option value={2}>耗材</Option>
+              <Option value={"1"}>备件</Option>
+              <Option value={"2"}>耗材</Option>
             </Select>
           )}
         </FormItem>

@@ -92,11 +92,18 @@ export default class Statistics extends React.Component {
     const columns = [
       {
         title: "商品编号",
-        dataIndex: "sparePartSn"
+        dataIndex: "sparePartId"
       },
       {
         title: "类别",
-        dataIndex: "sparePartType"
+        dataIndex: "sparePartType",
+        render(sparePartType){
+          let config = {
+            "1":"备件",
+            "2":"耗材"
+          }
+          return config[sparePartType];
+       }
       },
       {
         title: "商品名称",

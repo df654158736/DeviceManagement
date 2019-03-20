@@ -20,6 +20,8 @@ export default class Hall extends React.Component {
 
   request = () => {
     let localOptions = JSON.parse(localStorage.getItem('options'));
+    let userInfo = JSON.parse(localStorage.getItem('user'));
+    
     if (this.params != null) {
       axios
         .ajax({
@@ -46,7 +48,7 @@ export default class Hall extends React.Component {
         method: "post",
         url: "/hall/getHallList",
         data: {
-          params: this.params
+          params: { provId: userInfo.user.provId, cityId:userInfo.user.cityId, hallId:userInfo.user.hallId }
         }
       })
       .then(res => {
@@ -65,7 +67,7 @@ export default class Hall extends React.Component {
   dataChange = (params,item) => {
 
     this.params ={  pageNum: "1",pageSize: "100",provId: "", cityId: "", hallId: "" };
-
+    console.log(params);
     if (params.length == 3) {  //eslint-disable-line
       this.setState({
         provName:item[0].provName,

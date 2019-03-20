@@ -28,6 +28,10 @@ export default class Statistics extends React.Component {
   };
 
   componentDidMount() {
+    let userInfo = JSON.parse(localStorage.getItem('user'));
+    this.params.provId=userInfo.user.provId;
+    this.params.cityId=userInfo.user.cityId;
+    this.params.hallId=userInfo.user.hallId;
     this.request();
   }
 
@@ -54,7 +58,7 @@ export default class Statistics extends React.Component {
             method: "post",
             url: "/hall/getHallList",
             data: {
-              params: { provId: "", cityId: "", hallId: "" }
+              params: this.params
             }
           })
           .then(res => {
@@ -138,11 +142,18 @@ export default class Statistics extends React.Component {
     const columns = [
       {
         title: "商品编号",
-        dataIndex: "materialSn"
+        dataIndex: "sparePartId"
       },
       {
         title: "类别",
-        dataIndex: "sparePartType"
+        dataIndex: "sparePartType",
+        render(sparePartType){
+          let config = {
+            "1":"备件",
+            "2":"耗材"
+          }
+          return config[sparePartType];
+       }
       },
       {
         title: "商品名称",

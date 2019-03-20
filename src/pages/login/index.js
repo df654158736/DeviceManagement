@@ -12,14 +12,16 @@ class Login extends React.Component {
   handleSubmit = () => {
     this.props.form.validateFields((err, values) => {
       if (!err) {
+
+
         axios
         .ajax({
           method:"post",
           url: "/user/login",
           data: {
             params: {
-              "name":"aaa",
-              "password":"test"
+              "name":values.userName?values.userName:"aaa",
+              "password":values.psw?values.psw:"test"
             },
             isShowLoading:false
           }
